@@ -1,0 +1,42 @@
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <values.h>
+#include <limits.h>
+#include <string.h>
+#include <ctype.h>
+
+
+static void debug_check_graph(void);
+static void debug_dumpalleqns(void);
+
+void fatal_hook(void) { ; } /* a handy breakpoint for debugging */
+#define fatal(f, rest...) do { char buf[1024]; sprintf(buf, f, ##rest); \
+                            fprintf(stderr, "Error: %s\n", buf); \
+			    fatal_hook(); \
+                            debug_dumpalleqns(); \
+                            exit(100); } \
+                          while (0)
+int debugging = 0;
+#define debug(f, rest...) do { \
+                        if (debugging) fprintf(stderr, f, ##rest); \
+                        } while (0)
+void warn_hook(void) { ; } /* a handy breakpoint for debugging */
+#define warn(f, rest...) do { \
+                        fprintf(stderr, f, ##rest); \
+                        warn_hook(); \
+                        } while (0)
+static void *mymalloc(size_t len) {
+        void *p = malloc(len);
+        if (!p)
+                fatal("Out of memory.");
+        return p;
+}
+static void *myrealloc(void *old, size_t len) {
+        void *p = realloc(old, len);
+        if (!p)
+                fatal("Out of memory.");
+        return p;
+}
